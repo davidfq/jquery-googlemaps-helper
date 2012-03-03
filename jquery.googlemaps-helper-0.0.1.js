@@ -7,17 +7,49 @@
  * https://gist.github.com/828536
  */
 /*globals window, google, jQuery*/
-
+;
 var GMaps = (function(window, $) {
 
 	var instance = {},
 		now = $.now(),
-		deferred = null;
+		deferred = null,
+		gmaps = {};
 
 	getDeferred = function() {
 		deferred = deferred || $.Deferred();
 		return deferred;
 	},
+
+	setMap = function(map, markers){
+		gmaps[map.getDiv().id] = { 
+			gmap : map,
+			gmarkers : markers || []
+		};	
+	};
+
+	unsetMap = function(id){
+		delete gmaps[id];
+	}
+
+	setMarker = function(map, marker){
+		var id = map.getDiv().id;
+		if(typeof gmaps[id] !== 'undefined'){
+			gmaps[id].gmarkers.push(marker);
+		}else{
+			setMap(map,[marker]);
+		}
+	};
+
+	clearMarkers = function(id){
+		if(typeof gmaps[id] === 'undefined'){
+			return;
+		}
+		var markers = gmaps[id].gmarkers;
+		for(var i = 0; i < markers.length; i++){
+			markers[i].setMap(null);
+		}
+		gmaps[id].gmarkers = [];
+	};
 
 	instance.resolve = function() {
 		var result = window.google && google.maps ? google.maps : false;
@@ -42,8 +74,7 @@ var GMaps = (function(window, $) {
 					try {
 						delete window[callbackName];
 					} catch(e) {}
-				},
-				20);
+				}, 20);
 			};
 
 			// can't use the jXHR promise because 'script' doesn't 
@@ -65,13 +96,17 @@ var GMaps = (function(window, $) {
 		if (typeof opts.center === 'undefined' || typeof opts.center.lat === 'undefined') {
 			return;
 		}
+
 		var map = document.getElementById(domId),
 			myOptions = {
-			zoom: (opts && opts.zoom) || 8,
-			mapTypeId: google.maps.MapTypeId.ROADMAP,
-			center: new google.maps.LatLng(opts.center.lat, opts.center.lng)
-		};
-		return new google.maps.Map(map, myOptions);
+				zoom: (opts && opts.zoom) || 8,
+				mapTypeId: google.maps.MapTypeId.ROADMAP,
+				center: new google.maps.LatLng(opts.center.lat, opts.center.lng) 
+			},
+			newMap = new google.maps.Map(map, myOptions);
+		
+		setMap(newMap);
+		return newMap;
 	};
 
 	instance.marker = function(gmap, poi, clickHandler) {
@@ -81,9 +116,10 @@ var GMaps = (function(window, $) {
 			draggable: false,
 			position: new google.maps.LatLng(poi.lat, poi.lng)
 		});
-		if (typeof clickHandler !== 'undefined') {
+		if ($.isFunction(clickHandler)) {
 			google.maps.event.addListener(marker, 'click', clickHandler);
 		}
+		setMarker(gmap, marker);
 		return marker;
 	};
 
@@ -98,7 +134,17 @@ var GMaps = (function(window, $) {
 		}
 		gmap.fitBounds(bounds);
 	};
+	
+	instance.getMap = function(id){
+		return gmaps[id];
+	}
+	
+	instance.clearMarkers = function(map){
+		if(map.getDiv()){
+			clearMarkers(map.getDiv().id);
+		}
+	};
 
 	return instance;
 
-})(window, jQuery);
+}(window, jQuery));

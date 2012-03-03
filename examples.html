@@ -4,7 +4,13 @@
 	<meta charset="utf-8" />
 	<title>jQuery Google Maps helper examples</title>
 	<style>
-	  section{  float: left; margin: 1em; }
+	  body { font-family: arial, 'sans-serif'; }
+	  p { margin: .5em 0;  font-size: .8em; }
+	  section{  
+	    float: left; 
+	    margin: 1em; padding: .5em;
+	    background-color: #eee; }
+	  section>p{ margin-top: 0;}
 	</style>
 </head>
 <body>
@@ -22,6 +28,7 @@
   <section>
     <p>multiple markers, zoom adjusted to map bounds</p>
     <div id="map3" style="width:300px;height:300px"></div>
+    <button id="clearmarkers">clear markers</button>
   </section>
   
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
@@ -40,41 +47,49 @@
   </script>
   
   <script>
-    
     var clickHandler = function(){
       alert('i\'m marker: ' + this.title);
     };
     
     $(document).ready(function(){
 
-        $.when(GMaps.load()).then(function() {
-            
-        	var map1 = GMaps.map('map1', {
-        	  center : { 
-        	    lat: POIS[0].lat, 
-        	    lng : POIS[0].lng 
-        	  }
-        	});
-        	
-        	var map2 = GMaps.map('map2', {
-        	  zoom : 13,
-        	  center : { 
-        	    lat: POIS[0].lat, 
-        	    lng : POIS[0].lng 
-        	  }
-        	});
-        	GMaps.marker(map2, POIS[0], clickHandler);
-        	GMaps.marker(map2, POIS[1], clickHandler);
-        	
-        	var map3 = GMaps.map('map3', {
-        	  center : { 
-        	    lat: POIS[0].lat, 
-        	    lng : POIS[0].lng
-        	  }
-        	});
-        	GMaps.markers(map3, POIS, clickHandler);
-     
-        });
+      $.when(GMaps.load()).then(function() {
+        
+        // map1: simple map  
+      	var map1 = GMaps.map('map1', {
+      	  center : { 
+      	    lat: POIS[0].lat, 
+      	    lng : POIS[0].lng 
+      	  }
+      	});
+      	
+      	// map2: two markers, custom zoom
+      	var map2 = GMaps.map('map2', {
+      	  zoom : 13,
+      	  center : { 
+      	    lat: POIS[0].lat, 
+      	    lng : POIS[0].lng 
+      	  }
+      	});
+      	GMaps.marker(map2, POIS[0], clickHandler);
+      	GMaps.marker(map2, POIS[1], clickHandler);
+      	
+      	// map3: zoom adjusted to bounds
+      	var map3 = GMaps.map('map3', {
+      	  center : { 
+      	    lat: POIS[0].lat, 
+      	    lng : POIS[0].lng
+      	  }
+      	});
+      	GMaps.markers(map3, POIS, clickHandler);
+   
+      });
+    
+      $('#clearmarkers').click(function(){
+        var map3 = GMaps.getMap('map3');
+        GMaps.clearMarkers(map3.gmap);
+      });
+    
     });
   </script>
 </body>
