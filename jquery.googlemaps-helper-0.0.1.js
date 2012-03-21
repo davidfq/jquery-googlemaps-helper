@@ -15,45 +15,34 @@ var GMaps = (function(window, $) {
 		deferred = null,
 		gmaps = {};
 
-	getDeferred = function() {
+	_getDeferred = function() {
 		deferred = deferred || $.Deferred();
 		return deferred;
 	},
 
-	setMap = function(map, markers){
+	_setMap = function(map, markers){
 		gmaps[map.getDiv().id] = { 
 			gmap : map,
 			gmarkers : markers || []
 		};	
 	};
 
-	unsetMap = function(id){
+	_unsetMap = function(id){
 		delete gmaps[id];
 	}
 
-	setMarker = function(map, marker){
+	_setMarker = function(map, marker){
 		var id = map.getDiv().id;
 		if(typeof gmaps[id] !== 'undefined'){
 			gmaps[id].gmarkers.push(marker);
 		}else{
-			setMap(map,[marker]);
+			_setMap(map, [marker]);
 		}
-	};
-
-	clearMarkers = function(id){
-		if(typeof gmaps[id] === 'undefined'){
-			return;
-		}
-		var markers = gmaps[id].gmarkers;
-		for(var i = 0; i < markers.length; i++){
-			markers[i].setMap(null);
-		}
-		gmaps[id].gmarkers = [];
 	};
 
 	instance.resolve = function() {
 		var result = window.google && google.maps ? google.maps : false;
-		return getDeferred().resolve(result);
+		return _getDeferred().resolve(result);
 	},
 
 	instance.load = function() {
@@ -89,10 +78,10 @@ var GMaps = (function(window, $) {
 			});
 
 		}
-		return getDeferred().promise();
+		return _getDeferred().promise();
 	};
 
-	instance.map = function(domId, opts) {
+	instance.setMap = function(domId, opts) {
 		if (typeof opts.center === 'undefined' || typeof opts.center.lat === 'undefined') {
 			return;
 		}
@@ -105,11 +94,11 @@ var GMaps = (function(window, $) {
 			},
 			newMap = new google.maps.Map(map, myOptions);
 		
-		setMap(newMap);
+		_setMap(newMap);
 		return newMap;
 	};
 
-	instance.marker = function(gmap, poi, clickHandler) {
+	instance.setMarker = function(gmap, poi, clickHandler) {
 		var marker = new google.maps.Marker({
 			map: gmap,
 			title: (poi && poi.title) || poi.lat + ', ' + poi.lng,
@@ -119,18 +108,18 @@ var GMaps = (function(window, $) {
 		if ($.isFunction(clickHandler)) {
 			google.maps.event.addListener(marker, 'click', clickHandler);
 		}
-		setMarker(gmap, marker);
+		_setMarker(gmap, marker);
 		return marker;
 	};
 
-	instance.markers = function(gmap, pois, clickHandler) {
+	instance.setMarkers = function(gmap, pois, clickHandler) {
 		if (!$.isArray(pois) || pois.length === 0) {
 			return;
 		}
 		var _l = pois.length,
 			bounds = new google.maps.LatLngBounds();
 		for (var i = 0; i < _l; i++) {
-			bounds.extend(this.marker(gmap, pois[i], clickHandler).getPosition());
+			bounds.extend(this.setMarker(gmap, pois[i], clickHandler).getPosition());
 		}
 		gmap.fitBounds(bounds);
 	};
@@ -140,9 +129,15 @@ var GMaps = (function(window, $) {
 	}
 	
 	instance.clearMarkers = function(map){
-		if(map.getDiv()){
-			clearMarkers(map.getDiv().id);
+	  var id = map.gmap.getDiv().id;
+	  if(typeof gmaps[id] === 'undefined'){
+			return;
 		}
+		var markers = gmaps[id].gmarkers;
+		for(var i = 0; i < markers.length; i++){
+			markers[i].setMap(null);
+		}
+		gmaps[id].gmarkers = [];
 	};
 
 	return instance;
