@@ -15,23 +15,23 @@ var GMaps = (function(window, $) {
 		deferred = null,
 		gmaps = {};
 
-	_getDeferred = function() {
+	var _getDeferred = function() {
 		deferred = deferred || $.Deferred();
 		return deferred;
-	},
+	};
 
-	_setMap = function(map, markers){
+	var _setMap = function(map, markers){
 		gmaps[map.getDiv().id] = { 
 			gmap : map,
 			gmarkers : markers || []
 		};	
 	};
 
-	_unsetMap = function(id){
+	var _unsetMap = function(id){
 		delete gmaps[id];
-	}
+	};
 
-	_setMarker = function(map, marker){
+	var _setMarker = function(map, marker){
 		var id = map.getDiv().id;
 		if(typeof gmaps[id] !== 'undefined'){
 			gmaps[id].gmarkers.push(marker);
@@ -43,7 +43,7 @@ var GMaps = (function(window, $) {
 	instance.resolve = function() {
 		var result = window.google && google.maps ? google.maps : false;
 		return _getDeferred().resolve(result);
-	},
+	};
 
 	instance.load = function() {
 
@@ -126,7 +126,7 @@ var GMaps = (function(window, $) {
 	
 	instance.getMap = function(id){
 		return gmaps[id];
-	}
+	};
 	
 	instance.clearMarkers = function(map){
 	  var id = map.gmap.getDiv().id;
