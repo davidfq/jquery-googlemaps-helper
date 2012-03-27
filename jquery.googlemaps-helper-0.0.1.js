@@ -108,6 +108,9 @@ var GMaps = (function(window, $) {
 		if ($.isFunction(clickHandler)) {
 			google.maps.event.addListener(marker, 'click', clickHandler);
 		}
+    // custom data property which holds ref to poi
+    // useful when accessing data from clickHandler    
+    marker.data = poi;
 		_setMarker(gmap, marker);
 		return marker;
 	};
