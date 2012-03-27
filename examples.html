@@ -48,8 +48,7 @@
   
   <script>
     var clickHandler = function(){
-      alert('marker: ' + this.title);
-      
+      alert('marker: ' + this.title);      
     };
     
     $(document).ready(function(){
@@ -57,7 +56,8 @@
       $.when(GMaps.load()).then(function() {
         
         // map1: simple map  
-      	var map1 = GMaps.setMap('map1', {
+				var map1DomId = 'map1',
+      	 map1 = GMaps.newMap(map1DomId, {
       	  center : { 
       	    lat: POIS[0].lat, 
       	    lng : POIS[0].lng 
@@ -65,32 +65,34 @@
       	});
       	
       	// map2: two markers, custom zoom
-      	var map2 = GMaps.setMap('map2', {
+				var map2DomId = 'map2',
+      		map2 = GMaps.newMap(map2DomId, {
       	  zoom : 13,
       	  center : { 
       	    lat: POIS[0].lat, 
       	    lng : POIS[0].lng 
       	  }
       	});
-      	GMaps.setMarker(map2, POIS[0], clickHandler);
-      	GMaps.setMarker(map2, POIS[1], clickHandler);
+      	GMaps.setMarker(map2DomId, POIS[0], clickHandler);
+      	GMaps.setMarker(map2DomId, POIS[1], clickHandler);
       	
       	// map3: zoom adjusted to bounds
-      	var map3 = GMaps.setMap('map3', {
-      	  center : { 
-      	    lat: POIS[0].lat, 
-      	    lng : POIS[0].lng
-      	  }
-      	});
-      	GMaps.setMarkers(map3, POIS, clickHandler);
+				var map3DomId = 'map3',
+      		map3 = GMaps.newMap(map3DomId, {
+      	  	center : { 
+      	    	lat: POIS[0].lat, 
+      	    	lng : POIS[0].lng
+      	  	},
+						fitBounds : true
+      		});
+      	GMaps.setMarkers(map3DomId, POIS, clickHandler);
 				google.maps.event.addListener(map3, 'zoom_changed', function(){
 					console.log(this.getZoom());
 				});
       });
     
       $('#clearmarkers').click(function(){
-        var map3 = GMaps.getMap('map3');
-        GMaps.clearMarkers(map3);
+        GMaps.clearMarkers('map3');
       });
     
     });

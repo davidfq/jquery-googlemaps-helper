@@ -20,24 +20,14 @@ var GMaps = (function(window, $) {
 		return deferred;
 	};
 
-	var _setMap = function(map, markers){
-		gmaps[map.getDiv().id] = { 
+	var _addMap = function(map, markers, fit){
+		var newMap = { 
 			gmap : map,
-			gmarkers : markers || []
+			gmarkers : markers || [],
+			fitBounds : fit
 		};	
-	};
-
-	var _unsetMap = function(id){
-		delete gmaps[id];
-	};
-
-	var _setMarker = function(map, marker){
-		var id = map.getDiv().id;
-		if(typeof gmaps[id] !== 'undefined'){
-			gmaps[id].gmarkers.push(marker);
-		}else{
-			_setMap(map, [marker]);
-		}
+		gmaps[map.getDiv().id] = newMap;
+		return newMap;
 	};
 
 	instance.resolve = function() {
@@ -48,7 +38,7 @@ var GMaps = (function(window, $) {
 	instance.load = function() {
 
 		// If google.maps exists, then Google Maps API was probably 
-		// loaded with the 'script' tag
+		// loaded with the `script` tag
 		if (window.google && google.maps) {
 			this.resolve();
 		} else {
@@ -81,26 +71,30 @@ var GMaps = (function(window, $) {
 		return _getDeferred().promise();
 	};
 
-	instance.setMap = function(domId, opts) {
+	instance.newMap = function(domId, opts) {
+	  // can't create a map without center
 		if (typeof opts.center === 'undefined' || typeof opts.center.lat === 'undefined') {
 			return;
 		}
 
-		var map = document.getElementById(domId),
+		var mapDiv = document.getElementById(domId),
 			myOptions = {
 				zoom: (opts && opts.zoom) || 8,
-				mapTypeId: google.maps.MapTypeId.ROADMAP,
+				mapTypeId: (opts && opts.mapType) || google.maps.MapTypeId.ROADMAP,
 				center: new google.maps.LatLng(opts.center.lat, opts.center.lng) 
 			},
-			newMap = new google.maps.Map(map, myOptions);
+			newMap = new google.maps.Map(mapDiv, myOptions);
 		
-		_setMap(newMap);
-		return newMap;
+		return _addMap(newMap, null, (opts && opts.fitBounds) || false);  
 	};
 
-	instance.setMarker = function(gmap, poi, clickHandler) {
+	instance.setMarker = function(domId, poi, clickHandler) {
+	  var map = this.getMap(domId);
+	  if(!map){
+	    return;
+	  }
 		var marker = new google.maps.Marker({
-			map: gmap,
+			map: map.gmap,
 			title: (poi && poi.title) || poi.lat + ', ' + poi.lng,
 			draggable: false,
 			position: new google.maps.LatLng(poi.lat, poi.lng)
@@ -111,36 +105,39 @@ var GMaps = (function(window, $) {
     // custom data property which holds ref to poi
     // useful when accessing data from clickHandler    
     marker.data = poi;
-		_setMarker(gmap, marker);
-		return marker;
+    map.gmarkers.push(marker);
+    return marker;
 	};
 
-	instance.setMarkers = function(gmap, pois, clickHandler) {
+	instance.setMarkers = function(domId, pois, clickHandler) {
+	  var map = this.getMap(domId);
 		if (!$.isArray(pois) || pois.length === 0) {
 			return;
 		}
 		var _l = pois.length,
 			bounds = new google.maps.LatLngBounds();
 		for (var i = 0; i < _l; i++) {
-			bounds.extend(this.setMarker(gmap, pois[i], clickHandler).getPosition());
+		  var m = this.setMarker(domId, pois[i], clickHandler);
+		  bounds.extend(m.getPosition());
 		}
-		gmap.fitBounds(bounds);
+		if(map.fitBounds){
+		  map.gmap.fitBounds(bounds);
+		}
 	};
 	
-	instance.getMap = function(id){
-		return gmaps[id];
+	instance.getMap = function(domId){
+		return gmaps[domId];
 	};
 	
-	instance.clearMarkers = function(map){
-	  var id = map.gmap.getDiv().id;
-	  if(typeof gmaps[id] === 'undefined'){
-			return;
+	instance.clearMarkers = function(domId){
+	  var map = this.getMap(domId);
+	  if(!map){
+	    return;
+	  }
+		for(var i = 0; i < map.gmarkers.length; i++){
+			map.gmarkers[i].setMap(null);
 		}
-		var markers = gmaps[id].gmarkers;
-		for(var i = 0; i < markers.length; i++){
-			markers[i].setMap(null);
-		}
-		gmaps[id].gmarkers = [];
+		map.gmarkers = [];
 	};
 
 	return instance;

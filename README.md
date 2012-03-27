@@ -4,6 +4,3 @@ Based on Glenn Baker's gist : [Load Google Maps API using jQuery Deferred](https
 
 ...more to come
 
-## TODO
-
-  - fit map to bounds should be an option
