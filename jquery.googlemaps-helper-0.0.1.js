@@ -93,12 +93,21 @@ var GMaps = (function(window, $) {
 	  if(!map){
 	    return;
 	  }
-		var marker = new google.maps.Marker({
+    var markerOpts = {
 			map: map.gmap,
-			title: (poi && poi.title) || poi.lat + ', ' + poi.lng,
 			draggable: false,
 			position: new google.maps.LatLng(poi.lat, poi.lng)
-		});
+		};
+
+    if(poi.icon){
+      $.extend(markerOpts, { icon : poi.icon });
+    }
+
+    if(poi.title){
+      $.extend(markerOpts, { title : poi.title });
+    }
+
+		var marker = new google.maps.Marker(markerOpts);
 		if ($.isFunction(clickHandler)) {
 			google.maps.event.addListener(marker, 'click', clickHandler);
 		}
