@@ -30,6 +30,11 @@
     <div id="map3" style="width:300px;height:300px"></div>
     <button id="clearmarkers">clear markers</button>
   </section>
+
+  <section>
+    <p>mapOptions test</p>
+    <div id="map4" style="width:300px;height:300px"></div>
+  </section>
   
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
   <script src="jquery.googlemaps-helper-0.0.1.js"></script>
@@ -56,15 +61,15 @@
       $.when(GMaps.load()).then(function() {
         
         // map1: simple map  
-				var map1DomId = 'map1',
+			 var map1DomId = 'map1',
       	 map1 = GMaps.newMap(map1DomId, {
-      	  center : { 
-      	    lat: POIS[0].lat, 
-      	    lng : POIS[0].lng 
-      	  }
-      	});
+                        	  center : { 
+                        	    lat: POIS[0].lat, 
+                        	    lng : POIS[0].lng 
+                        	  }
+              	});
       	
-      	// map2: two markers, custom zoom
+        	// map2: two markers, custom zoom
 				var map2DomId = 'map2',
       		map2 = GMaps.newMap(map2DomId, {
       	  zoom : 13,
@@ -72,7 +77,7 @@
       	    lat: POIS[0].lat, 
       	    lng : POIS[0].lng 
       	  }
-      	});
+        	});
       	GMaps.setMarker(map2DomId, POIS[0], clickHandler);
       	GMaps.setMarker(map2DomId, POIS[1], clickHandler);
       	
@@ -80,21 +85,36 @@
 				var map3DomId = 'map3',
       		map3 = GMaps.newMap(map3DomId, {
       	  	center : { 
-      	    	lat: POIS[0].lat, 
+      	    	lat : POIS[0].lat, 
       	    	lng : POIS[0].lng
       	  	},
 						fitBounds : true
       		});
-      	GMaps.setMarkers(map3DomId, POIS, clickHandler);
-				google.maps.event.addListener(map3, 'zoom_changed', function(){
+      	  GMaps.setMarkers(map3DomId, POIS, clickHandler);
+				  google.maps.event.addListener(map3, 'zoom_changed', function(){
 					console.log(this.getZoom());
 				});
+        
+      // map4: mapOptions test
+      var map4 = GMaps.newMap('map4', {
+                	 	center : { 
+      	    	          lat : POIS[0].lat, 
+      	              	lng : POIS[0].lng
+      	  	           },
+       						fitBounds : false,
+                   draggable : false,
+                   disableDefaultUI: true
+                });
+
+
       });
+
     
       $('#clearmarkers').click(function(){
         GMaps.clearMarkers('map3');
       });
     
+
     });
   </script>
 </body>
