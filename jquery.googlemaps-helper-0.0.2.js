@@ -61,7 +61,7 @@ var GMaps = (function(window, $) {
 			$.ajax({
 				dataType: 'script',
 				data: {
-					'sensor': false,
+					'sensor': navigator && navigator.geolocation ? true : false,
 					'callback': callbackName
 				},
 				url: 'http://maps.google.com/maps/api/js'
