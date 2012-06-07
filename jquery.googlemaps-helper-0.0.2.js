@@ -81,7 +81,8 @@ var GMaps = (function(window, $) {
 			myOptions = {
 				zoom : (opts && opts.zoom) || 8,
         draggable : opts && opts.draggable,
-        disableDefaultUI : opts && opts.disableDefaultUI, 
+        disableDefaultUI : opts && opts.disableDefaultUI,
+        styles : opts && opts.styles, 
 				mapTypeId : (opts && opts.mapType) || google.maps.MapTypeId.ROADMAP,
 				center : new google.maps.LatLng(opts.center.lat, opts.center.lng) 
 			},
