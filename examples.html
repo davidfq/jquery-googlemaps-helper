@@ -34,6 +34,11 @@
     <p>mapOptions test</p>
     <div id="map4" style="width:300px;height:300px"></div>
   </section>
+
+  <section>
+    <p>blue map <a href="http://gmaps-samples-v3.googlecode.com/svn/trunk/styledmaps/wizard/index.html">build you own</a></p>
+    <div id="map5" style="width:300px;height:300px"></div>
+  </section>
   
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
   <script src="jquery.googlemaps-helper-0.0.2.js"></script>
@@ -103,6 +108,25 @@
        						fitBounds : false,
                    draggable : false,
                    disableDefaultUI: true
+                });
+
+
+      var stylez = [
+        {
+          stylers: [
+            { hue: "#0022ff" }
+          ]
+        }
+      ];
+
+
+      // map4: mapOptions test
+      var map5 = GMaps.newMap('map5', {
+                    center : { 
+                        lat : POIS[0].lat, 
+                        lng : POIS[0].lng
+                       },
+                  styles: stylez
                 });
 
 
