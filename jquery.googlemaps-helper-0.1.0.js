@@ -11,9 +11,10 @@
 var GMaps = (function(window, $) {
 
 	var instance = {},
-		now = $.now(),
-		deferred = null,
-		gmaps = {};
+		  now = $.now(),
+		  deferred = null,
+		  gmaps = {},
+      API_URL = 'http://maps.google.com/maps/api/js';
 
 	var _getDeferred = function() {
 		deferred = deferred || $.Deferred();
@@ -35,15 +36,20 @@ var GMaps = (function(window, $) {
 		return _getDeferred().resolve(result);
 	};
 
-	instance.load = function() {
+	instance.load = function(key, client) {
 
 		// If google.maps exists, then Google Maps API was probably 
 		// loaded with the `script` tag
 		if (window.google && google.maps) {
 			this.resolve();
 		} else {
-			// global callback name
-			var callbackName = "loadGoogleMaps_" + (now++);
+
+			var callbackName = "loadGoogleMaps_" + (now++),  // global callback name
+           params = {
+            sensor : navigator && navigator.geolocation ? true : false,
+            callback : callbackName
+           };
+
 			// declare the global callback
 			window[callbackName] = function() {
 				// resolve deferred object
@@ -56,15 +62,17 @@ var GMaps = (function(window, $) {
 				}, 20);
 			};
 
+      params = $.extend(params, { 
+        key : key || {},  
+        client : client || {}
+      });
+
 			// can't use the jXHR promise because 'script' doesn't 
 			// support 'callback=?'
 			$.ajax({
 				dataType: 'script',
-				data: {
-					'sensor': navigator && navigator.geolocation ? true : false,
-					'callback': callbackName
-				},
-				url: 'http://maps.google.com/maps/api/js'
+				data: params,
+				url: API_URL
 			});
 
 		}
