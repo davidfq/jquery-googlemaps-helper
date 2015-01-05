@@ -11,25 +11,25 @@
 var GMaps = (function(window, $) {
 
   var instance = {},
-      now = $.now(),
-      deferred = null,
-      gmaps = {},
-      API_URL = 'http://maps.google.com/maps/api/js';
+    now = $.now(),
+    deferred = null,
+    gmaps = {},
+    API_URL = '//maps.google.com/maps/api/js';
 
   var _getDeferred = function() {
-      deferred = deferred || $.Deferred();
-      return deferred;
-      };
+    deferred = deferred || $.Deferred();
+    return deferred;
+  };
 
   var _addMap = function(map, markers, fit) {
-      var newMap = {
-        gmap: map,
-        gmarkers: markers || [],
-        fitBounds: fit
-      };
-      gmaps[map.getDiv().id] = newMap;
-      return newMap;
-      };
+    var newMap = {
+      gmap: map,
+      gmarkers: markers || [],
+      fitBounds: fit
+    };
+    gmaps[map.getDiv().id] = newMap;
+    return newMap;
+  };
 
   instance.resolve = function() {
     var result = window.google && google.maps ? google.maps : false;
@@ -45,11 +45,11 @@ var GMaps = (function(window, $) {
     } else {
 
       var callbackName = "loadGoogleMaps_" + (now++),
-           // global callback name
-          params = {
-            sensor: navigator && navigator.geolocation ? true : false,
-            callback: callbackName
-          };
+        // global callback name
+        params = {
+          sensor: navigator && navigator.geolocation ? true : false,
+          callback: callbackName
+        };
 
       // declare the global callback
       window[callbackName] = function() {
